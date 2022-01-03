@@ -1,0 +1,121 @@
+package status
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/fluxcd/pkg/apis/meta"
+	"github.com/fluxcd/pkg/runtime/conditions"
+	"github.com/kylelemons/godebug/pretty"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
+
+// Negative polarity condition present when Ready condition is True.
+func check_WARN0001(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+	if !conditions.IsTrue(obj, meta.ReadyCondition) {
+		return nil
+	}
+	// Return if no negative polarity context is provided.
+	if len(condns.NegativePolarity) == 0 {
+		return nil
+	}
+	// Collect problematic conditions.
+	probConditions := []string{}
+	for _, cond := range condns.NegativePolarity {
+		if c := conditions.Get(obj, cond); c != nil {
+			probConditions = append(probConditions, c.Type)
+		}
+	}
+	if len(probConditions) > 0 {
+		return fmt.Errorf(
+			"Negative polarity condition present when Ready condition is True: %v",
+			probConditions)
+	}
+	return nil
+}
+
+// Ready condition should have the value of the negative polarity conditon
+// that's present with the highest priority.
+func check_WARN0002(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+	if conditions.IsTrue(obj, meta.ReadyCondition) {
+		return nil
+	}
+	// Return if no negative polarity context is provided.
+	if len(condns.NegativePolarity) == 0 {
+		return nil
+	}
+	ready := conditions.Get(obj, meta.ReadyCondition)
+	hnpc, err := HighestNegativePriorityCondition(condns, obj.GetConditions())
+	if err != nil {
+		return err
+	}
+	// Return if no negative polarity condition was found.
+	if hnpc == nil {
+		return nil
+	}
+	if ready.Message != hnpc.Message || ready.Reason != hnpc.Reason {
+		return fmt.Errorf(
+			"Ready condition should have the value of the negative polarity conditon that's present with the highest priority: Ready != %s\nDiff:\n%v",
+			hnpc.Type, compareAndDiffConditions(ready, hnpc))
+	}
+	return nil
+}
+
+// Reconciling condition can be removed when its value is False.
+func check_WARN0003(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+	if !conditions.Has(obj, meta.ReconcilingCondition) {
+		return nil
+	}
+	rec := conditions.Get(obj, meta.ReconcilingCondition)
+	if rec.Status == metav1.ConditionFalse {
+		return fmt.Errorf("Reconciling condition can be removed when its value is False")
+	}
+	return nil
+}
+
+// Stalled condition can be removed when its value is False.
+func check_WARN0004(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+	if !conditions.Has(obj, meta.StalledCondition) {
+		return nil
+	}
+	rec := conditions.Get(obj, meta.StalledCondition)
+	if rec.Status == metav1.ConditionFalse {
+		return fmt.Errorf("Stalled condition can be removed when its value is False")
+	}
+	return nil
+}
+
+// Missing ObservedGeneration from status condition.
+func check_WARN0005(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+	probConditions := []string{}
+	for _, c := range obj.GetConditions() {
+		if c.ObservedGeneration < 1 {
+			probConditions = append(probConditions, c.Type)
+		}
+	}
+	if len(probConditions) > 0 {
+		return fmt.Errorf("Missing ObservedGeneration from status condition: %v", probConditions)
+	}
+	return nil
+}
+
+// compareAndDiffConditions returns a pretty printed diff of the values of two
+// conditions.
+func compareAndDiffConditions(a, b *metav1.Condition) string {
+	// Intermediate representation of Condition, focusing only on Reason and
+	// Message, to create diffs.
+	type conditionValues struct {
+		Reason  string
+		Message string
+	}
+	acv := conditionValues{
+		Reason:  a.Reason,
+		Message: a.Message,
+	}
+	bcv := conditionValues{
+		Reason:  b.Reason,
+		Message: b.Message,
+	}
+	return pretty.Compare(acv, bcv)
+}
