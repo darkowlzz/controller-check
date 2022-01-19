@@ -24,7 +24,7 @@
 //      // Create a status checker with context about the controller. In this
 //      // case, TestCondition1 and TestCondition2 are the negative polarity
 //      // conditions supported by the Obj controller.
-//      conditions := &Conditions{NegativePolarity: []string{"TestCondition1", "TestCondition2"}}
+//      conditions := &status.Conditions{NegativePolarity: []string{"TestCondition1", "TestCondition2"}}
 //      checker := status.NewChecker(client, scheme, conditions)
 //
 //      // Check object status.
