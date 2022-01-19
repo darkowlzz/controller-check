@@ -58,12 +58,9 @@ func getStatusObservedGeneration(scheme *runtime.Scheme, obj client.Object) (int
 	if err := scheme.Convert(obj, u, nil); err != nil {
 		return 0, err
 	}
-	observedGen, found, err := unstructured.NestedInt64(u.Object, "status", "observedGeneration")
+	observedGen, _, err := unstructured.NestedInt64(u.Object, "status", "observedGeneration")
 	if err != nil {
 		return 0, err
-	}
-	if !found {
-		return 0, fmt.Errorf("status.observedGeneration not found")
 	}
 	return observedGen, nil
 }
