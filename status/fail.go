@@ -7,11 +7,10 @@ import (
 	"github.com/fluxcd/pkg/apis/meta"
 	"github.com/fluxcd/pkg/runtime/conditions"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Negative polarity condition cannot be True when Ready condition is True.
-func check_FAIL0001(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0001(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsTrue(obj, meta.ReadyCondition) {
 		return nil
 	}
@@ -37,7 +36,7 @@ func check_FAIL0001(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Ready condition must always be present.
-func check_FAIL0002(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0002(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.Has(obj, meta.ReadyCondition) {
 		return fmt.Errorf("Ready condition must always be present")
 	}
@@ -45,7 +44,7 @@ func check_FAIL0002(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Ready condition must be False when Reconciling condition is True.
-func check_FAIL0003(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0003(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.Has(obj, meta.ReconcilingCondition) {
 		return nil
 	}
@@ -62,7 +61,7 @@ func check_FAIL0003(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Ready condition must be False when Stalled condition is True.
-func check_FAIL0004(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0004(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.Has(obj, meta.StalledCondition) {
 		return nil
 	}
@@ -80,7 +79,7 @@ func check_FAIL0004(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // Only one of Reconciling condition or Stalled condition must be present at a
 // time.
-func check_FAIL0005(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0005(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if conditions.Has(obj, meta.ReconcilingCondition) && conditions.Has(obj, meta.StalledCondition) {
 		return fmt.Errorf("Only one of Reconciling condition or Stalled condition must be present at a time")
 	}
@@ -88,8 +87,8 @@ func check_FAIL0005(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // The ObservedGeneration must be less than or equal to the object Generation.
-func check_FAIL0006(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
-	og, err := getStatusObservedGeneration(scheme, obj)
+func check_FAIL0006(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
+	og, err := getStatusObservedGeneration(obj)
 	if err != nil {
 		return fmt.Errorf("CHECK_FAIL0006: failed to get observed generation: %w", err)
 	}
@@ -101,8 +100,8 @@ func check_FAIL0006(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // Ready condition must be False when the ObservedGeneration is less than the
 // object Generation.
-func check_FAIL0007(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
-	og, err := getStatusObservedGeneration(scheme, obj)
+func check_FAIL0007(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
+	og, err := getStatusObservedGeneration(obj)
 	if err != nil {
 		return fmt.Errorf("CHECK_FAIL0007: failed to get observed generation: %w", err)
 	}
@@ -116,7 +115,7 @@ func check_FAIL0007(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // Ready condition must be False when any of the status condition's
 // ObservedGeneration is less than the object Generation.
-func check_FAIL0008(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0008(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsReady(obj) {
 		return nil
 	}
@@ -136,11 +135,11 @@ func check_FAIL0008(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // The status conditions' ObservedGenerations must be equal to the root
 // ObservedGeneration when Ready condition is True.
-func check_FAIL0009(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0009(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsReady(obj) {
 		return nil
 	}
-	og, err := getStatusObservedGeneration(scheme, obj)
+	og, err := getStatusObservedGeneration(obj)
 	if err != nil {
 		return fmt.Errorf("CHECK_FAIL0009: failed to get observed generation: %w", err)
 	}
@@ -159,11 +158,11 @@ func check_FAIL0009(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // The root ObservedGeneration must be less than the Reconciling condition
 // ObservedGeneration when it Reconciling condition is True.
-func check_FAIL0010(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_FAIL0010(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsReconciling(obj) {
 		return nil
 	}
-	og, err := getStatusObservedGeneration(scheme, obj)
+	og, err := getStatusObservedGeneration(obj)
 	if err != nil {
 		return fmt.Errorf("CHECK_FAIL0010: failed to get observed generation: %w", err)
 	}

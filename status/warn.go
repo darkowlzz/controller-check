@@ -8,11 +8,10 @@ import (
 	"github.com/fluxcd/pkg/runtime/conditions"
 	"github.com/kylelemons/godebug/pretty"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Negative polarity condition present when Ready condition is True.
-func check_WARN0001(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_WARN0001(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsTrue(obj, meta.ReadyCondition) {
 		return nil
 	}
@@ -37,7 +36,7 @@ func check_WARN0001(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 
 // Ready condition should have the value of the negative polarity conditon
 // that's present with the highest priority.
-func check_WARN0002(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_WARN0002(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if conditions.IsTrue(obj, meta.ReadyCondition) {
 		return nil
 	}
@@ -63,7 +62,7 @@ func check_WARN0002(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Reconciling condition can be removed when its value is False.
-func check_WARN0003(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_WARN0003(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.Has(obj, meta.ReconcilingCondition) {
 		return nil
 	}
@@ -75,7 +74,7 @@ func check_WARN0003(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Stalled condition can be removed when its value is False.
-func check_WARN0004(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_WARN0004(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.Has(obj, meta.StalledCondition) {
 		return nil
 	}
@@ -87,7 +86,7 @@ func check_WARN0004(ctx context.Context, scheme *runtime.Scheme, obj conditions.
 }
 
 // Missing ObservedGeneration from status condition.
-func check_WARN0005(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error {
+func check_WARN0005(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	probConditions := []string{}
 	for _, c := range obj.GetConditions() {
 		if c.ObservedGeneration < 1 {

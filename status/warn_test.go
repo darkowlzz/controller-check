@@ -63,7 +63,7 @@ func Test_check_WARN0001(t *testing.T) {
 			}
 
 			condns := &Conditions{NegativePolarity: tt.negativePolarity}
-			err := check_WARN0001(context.TODO(), nil, obj, condns)
+			err := check_WARN0001(context.TODO(), obj, condns)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -141,7 +141,7 @@ func Test_check_WARN0002(t *testing.T) {
 			}
 
 			condns := &Conditions{NegativePolarity: tt.negativePolarity}
-			err := check_WARN0002(context.TODO(), nil, obj, condns)
+			err := check_WARN0002(context.TODO(), obj, condns)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 
 			if tt.errCheck != nil {
@@ -187,7 +187,7 @@ func Test_check_WARN0003(t *testing.T) {
 			if tt.addConditions != nil {
 				tt.addConditions(obj)
 			}
-			err := check_WARN0003(context.TODO(), nil, obj, nil)
+			err := check_WARN0003(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -229,7 +229,7 @@ func Test_check_WARN0004(t *testing.T) {
 			if tt.addConditions != nil {
 				tt.addConditions(obj)
 			}
-			err := check_WARN0004(context.TODO(), nil, obj, nil)
+			err := check_WARN0004(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -278,7 +278,7 @@ func Test_check_WARN0005(t *testing.T) {
 			g := NewWithT(t)
 			obj := &testdata.Fake{}
 			obj.SetConditions(tt.conditions)
-			err := check_WARN0005(context.TODO(), nil, obj, nil)
+			err := check_WARN0005(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}

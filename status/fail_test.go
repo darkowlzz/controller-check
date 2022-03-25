@@ -72,7 +72,7 @@ func Test_check_FAIL0001(t *testing.T) {
 			}
 
 			condns := &Conditions{NegativePolarity: tt.negativePolarity}
-			err := check_FAIL0001(context.TODO(), nil, obj, condns)
+			err := check_FAIL0001(context.TODO(), obj, condns)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 
 			if tt.errCheck != nil {
@@ -114,7 +114,7 @@ func Test_check_FAIL0002(t *testing.T) {
 				tt.addConditions(obj)
 			}
 
-			err := check_FAIL0002(context.TODO(), nil, obj, nil)
+			err := check_FAIL0002(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -171,7 +171,7 @@ func Test_check_FAIL0003(t *testing.T) {
 			if tt.addConditions != nil {
 				tt.addConditions(obj)
 			}
-			err := check_FAIL0003(context.TODO(), nil, obj, nil)
+			err := check_FAIL0003(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -228,7 +228,7 @@ func Test_check_FAIL0004(t *testing.T) {
 			if tt.addConditions != nil {
 				tt.addConditions(obj)
 			}
-			err := check_FAIL0004(context.TODO(), nil, obj, nil)
+			err := check_FAIL0004(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -277,7 +277,7 @@ func Test_check_FAIL0005(t *testing.T) {
 			if tt.addConditions != nil {
 				tt.addConditions(obj)
 			}
-			err := check_FAIL0005(context.TODO(), nil, obj, nil)
+			err := check_FAIL0005(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -319,7 +319,7 @@ func Test_check_FAIL0006(t *testing.T) {
 			obj.SetGeneration(tt.objectGeneration)
 			obj.Status.ObservedGeneration = tt.observedGeneration
 
-			err := check_FAIL0006(context.TODO(), scheme, obj, nil)
+			err := check_FAIL0006(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -376,7 +376,7 @@ func Test_check_FAIL0007(t *testing.T) {
 				tt.addConditions(obj)
 			}
 
-			err := check_FAIL0007(context.TODO(), scheme, obj, nil)
+			err := check_FAIL0007(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
@@ -452,7 +452,7 @@ func Test_check_FAIL0008(t *testing.T) {
 			obj.SetGeneration(tt.objectGeneration)
 			obj.SetConditions(tt.conditions)
 
-			err := check_FAIL0008(context.TODO(), nil, obj, nil)
+			err := check_FAIL0008(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 
 			if tt.errCheck != nil {
@@ -536,7 +536,7 @@ func Test_check_FAIL0009(t *testing.T) {
 			obj.Status.ObservedGeneration = tt.rootObservedGeneration
 			obj.SetConditions(tt.conditions)
 
-			err := check_FAIL0009(context.TODO(), scheme, obj, nil)
+			err := check_FAIL0009(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 
 			if tt.errCheck != nil {
@@ -600,7 +600,7 @@ func Test_check_FAIL0010(t *testing.T) {
 			obj.Status.ObservedGeneration = tt.rootObservedGeneration
 			obj.SetConditions(tt.conditions)
 
-			err := check_FAIL0010(context.TODO(), scheme, obj, nil)
+			err := check_FAIL0010(context.TODO(), obj, nil)
 			g.Expect(err != nil).To(Equal(tt.wantErr))
 		})
 	}
