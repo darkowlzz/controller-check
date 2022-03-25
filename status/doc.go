@@ -12,8 +12,6 @@
 //  )
 //
 //  func TestFoo() {
-//      scheme := runtime.NewScheme()
-//
 //      obj := &testapi.Obj{}
 //      obj.Name = "test-obj"
 //      obj.Namespace = "test-ns"
@@ -25,7 +23,7 @@
 //      // case, TestCondition1 and TestCondition2 are the negative polarity
 //      // conditions supported by the Obj controller.
 //      conditions := &status.Conditions{NegativePolarity: []string{"TestCondition1", "TestCondition2"}}
-//      checker := status.NewChecker(client, scheme, conditions)
+//      checker := status.NewChecker(client, conditions)
 //
 //      // Check object status.
 //      checker.CheckErr(context.TODO(), obj)

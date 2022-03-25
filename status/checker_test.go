@@ -54,7 +54,7 @@ func TestCheck(t *testing.T) {
 
 			// Register negative polarity conditions with the checker.
 			conditions := &Conditions{NegativePolarity: []string{"TestCondition1", "TestCondition2"}}
-			checker := NewChecker(builder.Build(), scheme, conditions)
+			checker := NewChecker(builder.Build(), conditions)
 			checker.DisableFetch = tt.disableFetch
 
 			fail, warn := checker.Check(context.TODO(), objOld)

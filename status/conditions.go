@@ -53,9 +53,9 @@ func HighestNegativePriorityCondition(conditions *Conditions, condns []metav1.Co
 
 // getStatusObservedGeneration returns the status.observedGeneration of an
 // object.
-func getStatusObservedGeneration(scheme *runtime.Scheme, obj client.Object) (int64, error) {
-	u := &unstructured.Unstructured{}
-	if err := scheme.Convert(obj, u, nil); err != nil {
+func getStatusObservedGeneration(obj client.Object) (int64, error) {
+	u, err := toUnstructured(obj)
+	if err != nil {
 		return 0, err
 	}
 	observedGen, _, err := unstructured.NestedInt64(u.Object, "status", "observedGeneration")
@@ -74,4 +74,19 @@ func isNegativePolarityCondition(context []string, condn metav1.Condition) bool 
 		}
 	}
 	return false
+}
+
+// toUnstructured converts a runtime object into Unstructured.
+func toUnstructured(obj runtime.Object) (*unstructured.Unstructured, error) {
+	// If the incoming object is already unstructured, perform a deep copy first
+	// otherwise DefaultUnstructuredConverter ends up returning the inner map
+	// without making a copy.
+	if _, ok := obj.(runtime.Unstructured); ok {
+		obj = obj.DeepCopyObject()
+	}
+	rawMap, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return nil, err
+	}
+	return &unstructured.Unstructured{Object: rawMap}, nil
 }

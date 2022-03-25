@@ -7,21 +7,18 @@ import (
 	"os"
 
 	"github.com/fluxcd/pkg/runtime/conditions"
-	"k8s.io/apimachinery/pkg/runtime"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // checkFunc is the function type for all the status check functions.
-type checkFunc func(ctx context.Context, scheme *runtime.Scheme, obj conditions.Getter, condns *Conditions) error
+type checkFunc func(ctx context.Context, obj conditions.Getter, condns *Conditions) error
 
 // Checker performs all the status checks. It is configured to provide context
 // of the target controller.
 type Checker struct {
 	// K8s client, to fetch the latest version of an object.
 	client.Client
-	// scheme is the scheme of the target objects.
-	scheme *runtime.Scheme
 	// conditions is the conditions context of the target controller.
 	conditions *Conditions
 	// failChecks contains all the strict checks.
@@ -42,7 +39,7 @@ type Checker struct {
 }
 
 // NewChecker constructs and returns a new Checker for a controller.
-func NewChecker(cli client.Client, scheme *runtime.Scheme, condns *Conditions) *Checker {
+func NewChecker(cli client.Client, condns *Conditions) *Checker {
 	warnChecks := []checkFunc{
 		check_WARN0001,
 		check_WARN0002,
@@ -64,7 +61,6 @@ func NewChecker(cli client.Client, scheme *runtime.Scheme, condns *Conditions) *
 	}
 	return &Checker{
 		Client:     cli,
-		scheme:     scheme,
 		conditions: condns,
 		warnChecks: warnChecks,
 		failChecks: failChecks,
@@ -99,14 +95,14 @@ func (c Checker) Check(ctx context.Context, obj conditions.Getter) (fail, warn e
 	}
 	warnErrs := []error{}
 	for _, check := range c.warnChecks {
-		if err := check(ctx, c.scheme, obj, c.conditions); err != nil {
+		if err := check(ctx, obj, c.conditions); err != nil {
 			warnErrs = append(warnErrs, err)
 		}
 	}
 	warn = kerrors.NewAggregate(warnErrs)
 	failErr := []error{}
 	for _, check := range c.failChecks {
-		if err := check(ctx, c.scheme, obj, c.conditions); err != nil {
+		if err := check(ctx, obj, c.conditions); err != nil {
 			failErr = append(failErr, err)
 		}
 	}
