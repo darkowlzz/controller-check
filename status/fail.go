@@ -157,7 +157,7 @@ func check_FAIL0009(ctx context.Context, obj conditions.Getter, condns *Conditio
 }
 
 // The root ObservedGeneration must be less than the Reconciling condition
-// ObservedGeneration when it Reconciling condition is True.
+// ObservedGeneration when Reconciling condition is True.
 func check_FAIL0010(ctx context.Context, obj conditions.Getter, condns *Conditions) error {
 	if !conditions.IsReconciling(obj) {
 		return nil
@@ -168,7 +168,7 @@ func check_FAIL0010(ctx context.Context, obj conditions.Getter, condns *Conditio
 	}
 	rec := conditions.Get(obj, meta.ReconcilingCondition)
 	if og >= rec.ObservedGeneration {
-		return fmt.Errorf("The root ObservedGeneration must be less than the Reconciling condition ObservedGeneration when it Reconciling condition is True")
+		return fmt.Errorf("The root ObservedGeneration must be less than the Reconciling condition ObservedGeneration when Reconciling condition is True")
 	}
 	return nil
 }

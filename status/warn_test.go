@@ -128,6 +128,15 @@ func Test_check_WARN0002(t *testing.T) {
 				conditions.MarkTrue(obj, "TestCondition3", "Foo2", "Bar2")
 			},
 		},
+		{
+			name:             "Ready False, with different highest negative condition Reconciling",
+			negativePolarity: []string{meta.StalledCondition, meta.ReconcilingCondition},
+			addConditions: func(obj conditions.Setter) {
+				conditions.MarkFalse(obj, meta.ReadyCondition, "FooReason", "BarMsg")
+				conditions.MarkTrue(obj, meta.ReconcilingCondition, "NewGeneration", "reconciling new obj gen")
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
