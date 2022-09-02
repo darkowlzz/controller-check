@@ -53,12 +53,12 @@ func check_WARN0002(ctx context.Context, obj conditions.Getter, condns *Conditio
 	if hnpc == nil {
 		return nil
 	}
-	// Return if the highest negative polarity condition is Reconciling
-	// condition.
-	// NOTE: This is needed to preserve the Reconciling and Ready values in
-	// situations where there's no custom negative polarity conditions and
-	// Stalled and Reconciling are the only negative conditions.
-	if hnpc.Type == meta.ReconcilingCondition {
+	// Return if the highest negative polarity condition is Reconciling or
+	// Stalled condition.
+	// NOTE: This is needed to preserve the Reconciling or Stalled and Ready
+	// values in situations where there's no custom negative polarity conditions
+	// and Stalled and Reconciling are the only negative conditions.
+	if hnpc.Type == meta.ReconcilingCondition || hnpc.Type == meta.StalledCondition {
 		return nil
 	}
 	if ready.Message != hnpc.Message || ready.Reason != hnpc.Reason {
